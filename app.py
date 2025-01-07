@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 import signal
 import sys
+import asyncio
 
 # Load environment variables
 load_dotenv()
@@ -29,7 +30,7 @@ def health_check():
     return jsonify({"status": "healthy"}), 200
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
-async def chat():
+def chat():
     """Handle chat requests"""
     if request.method == 'OPTIONS':
         return '', 200
@@ -46,7 +47,12 @@ async def chat():
             return jsonify({'error': 'No message provided'}), 400
             
         logger.info(f"Received question: {question}")
-        answer = await text_processor.process_question(question)
+        
+        # Create event loop and run async function
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        answer = loop.run_until_complete(text_processor.process_question(question))
+        loop.close()
         
         if not answer:
             logger.error("No answer generated")
@@ -63,7 +69,7 @@ async def chat():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/refresh', methods=['POST'])
-async def refresh_knowledge():
+def refresh_knowledge():
     """Refresh the knowledge base"""
     try:
         logger.info("Refreshing knowledge base...")
