@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import logging
 from text_processor import TextProcessor
@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='build', static_url_path='')
 CORS(app)
 
 # Initialize text processor
@@ -88,6 +88,21 @@ def refresh_knowledge():
             'status': 'error',
             'message': f'Failed to refresh knowledge base: {str(e)}'
         }), 500
+
+@app.route('/')
+def serve():
+    """Serve React App"""
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/static/<path:path>')
+def serve_static(path):
+    """Serve static files"""
+    return send_from_directory(app.static_folder + '/static', path)
+
+@app.errorhandler(404)
+def not_found(e):
+    """Handle 404 errors by serving index.html"""
+    return send_from_directory(app.static_folder, 'index.html')
 
 def signal_handler(sig, frame):
     """Handle shutdown signals"""
