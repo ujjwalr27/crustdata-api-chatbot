@@ -171,7 +171,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/chat`, {
+      const response = await axios.post(`/api/chat`, {
         message: inputMessage
       });
 
@@ -204,7 +204,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/refresh`);
+      const response = await axios.post(`/api/refresh`);
       
       if (response.data.status === 'error') {
         throw new Error(response.data.message);

@@ -24,7 +24,7 @@ CORS(app)
 # Initialize text processor
 text_processor = TextProcessor()
 
-@app.route('/health', methods=['GET'])
+@app.route('/health')
 def health_check():
     """Health check endpoint"""
     return jsonify({"status": "healthy"}), 200
@@ -61,7 +61,7 @@ def chat():
         logger.info("Answer generated successfully")
         return jsonify({
             'answer': answer,
-            'sources': []  # We can add sources later if needed
+            'sources': []
         })
             
     except Exception as e:
